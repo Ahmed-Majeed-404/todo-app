@@ -48,3 +48,10 @@ export async function restoreTask(id) {
   db.prepare(`UPDATE tasks SET archived_at = NULL WHERE id = ?`).run(id);
   revalidateAll();
 }
+const STATUSES = ['todo', 'inprogress', 'completed'];
+
+export async function setStatus(id, status) {
+  if (!STATUSES.includes(status)) return;
+  db.prepare('UPDATE tasks SET status = ? WHERE id = ?').run(status, id);
+  revalidateAll();
+}
