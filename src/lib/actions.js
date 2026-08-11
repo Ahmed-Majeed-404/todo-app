@@ -5,12 +5,14 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { STATUS_VALUES } from './statuses';
 
+const DEFAULT_TOPIC = 'General';
+
 function readForm(formData) {
   return {
     title: formData.get('title')?.trim() ?? '',
     description: formData.get('description')?.trim() ?? '',
     due_date: formData.get('due_date') || null,
-    topic: formData.get('topic')?.trim() ?? '',
+    topic: formData.get('topic')?.trim() || DEFAULT_TOPIC,
   };
 }
 

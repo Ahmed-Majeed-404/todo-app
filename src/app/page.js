@@ -19,7 +19,7 @@ export default async function Home({ searchParams }) {
   return (
     <main className="mx-auto max-w-xl p-8">
       <div className="mb-6 flex justify-between">
-        <h1 className="text-xl font-semibold">Tasks</h1>
+        <h1 className="text-xl font-semibold">My Tasks</h1>
         <Link href="/archive" className="underline">Archive</Link>
       </div>
 
@@ -50,9 +50,8 @@ export default async function Home({ searchParams }) {
                   <p className="mt-1 text-sm opacity-70">{task.description}</p>
                 )}
                 <p className="mt-2 text-xs opacity-60">
-                  {task.topic && <span>{task.topic}</span>}
-                  {task.topic && task.due_date && <span> · </span>}
-                  {task.due_date && <span>Due {task.due_date}</span>}
+                  <span>{task.topic}</span>
+                  {task.due_date && <span> · Due {task.due_date}</span>}
                   {isOverdue(task) && (
                     <span className="ml-2 rounded border border-red-600 px-1.5 py-0.5 font-medium text-red-600">
                       Overdue
