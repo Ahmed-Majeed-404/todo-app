@@ -3,6 +3,7 @@
 import db from './db';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { STATUS_VALUES } from './statuses';
 
 function readForm(formData) {
   return {
@@ -39,6 +40,12 @@ export async function updateTask(id, formData) {
   redirect('/');
 }
 
+export async function setStatus(id, status) {
+  if (!STATUS_VALUES.includes(status)) return;
+  db.prepare('UPDATE tasks SET status = ? WHERE id = ?').run(status, id);
+  revalidateAll();
+}
+
 export async function archiveTask(id) {
   db.prepare(`UPDATE tasks SET archived_at = datetime('now') WHERE id = ?`).run(id);
   revalidateAll();
@@ -46,12 +53,5 @@ export async function archiveTask(id) {
 
 export async function restoreTask(id) {
   db.prepare(`UPDATE tasks SET archived_at = NULL WHERE id = ?`).run(id);
-  revalidateAll();
-}
-const STATUSES = ['todo', 'inprogress', 'completed'];
-
-export async function setStatus(id, status) {
-  if (!STATUSES.includes(status)) return;
-  db.prepare('UPDATE tasks SET status = ? WHERE id = ?').run(status, id);
   revalidateAll();
 }

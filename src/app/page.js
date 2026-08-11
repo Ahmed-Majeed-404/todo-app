@@ -1,14 +1,15 @@
 import Link from 'next/link';
 import db from '@/lib/db';
 import { createTask, archiveTask, setStatus } from '@/lib/actions';
-import { SORTS, SORT_LABELS } from '@/lib/sorts';
+import { SORTS, SORT_LABELS, DEFAULT_SORT } from '@/lib/sorts';
+import { STATUSES } from '@/lib/statuses';
 import TaskForm from '@/components/TaskForm';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Home({ searchParams }) {
-  const { sort = 'created' } = await searchParams;
-  const orderBy = SORTS[sort] ?? SORTS.created;
+  const { sort = DEFAULT_SORT } = await searchParams;
+  const orderBy = SORTS[sort] ?? SORTS[DEFAULT_SORT];
 
   const tasks = db.prepare(`
     SELECT * FROM tasks WHERE archived_at IS NULL ORDER BY ${orderBy}
@@ -54,11 +55,11 @@ export default async function Home({ searchParams }) {
                 </p>
 
                 <div className="mt-3 flex gap-1 text-xs">
-                  {[['todo', 'To do'], ['inprogress', 'In progress'], ['completed', 'Completed']].map(([s, label]) => (
-                    <form key={s} action={setStatus.bind(null, task.id, s)}>
+                  {STATUSES.map(({ value, label, idle, active }) => (
+                    <form key={value} action={setStatus.bind(null, task.id, value)}>
                       <button
-                        className={`border px-2 py-1 ${
-                          task.status === s ? 'bg-black text-white' : 'opacity-60'
+                        className={`rounded border px-2 py-1 ${
+                          task.status === value ? active : idle
                         }`}
                       >
                         {label}
