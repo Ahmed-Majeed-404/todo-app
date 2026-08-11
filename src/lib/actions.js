@@ -1,18 +1,16 @@
 'use server';
 
-import db from './db';
+import db from './db.js';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { STATUS_VALUES } from './statuses';
-
-const DEFAULT_TOPIC = 'General';
+import * as tasks from './tasks.js';
 
 function readForm(formData) {
   return {
-    title: formData.get('title')?.trim() ?? '',
-    description: formData.get('description')?.trim() ?? '',
-    due_date: formData.get('due_date') || null,
-    topic: formData.get('topic')?.trim() || DEFAULT_TOPIC,
+    title: formData.get('title'),
+    description: formData.get('description'),
+    due_date: formData.get('due_date'),
+    topic: formData.get('topic'),
   };
 }
 
@@ -22,38 +20,27 @@ function revalidateAll() {
 }
 
 export async function createTask(formData) {
-  const task = readForm(formData);
-  if (!task.title) return;
-  db.prepare(`
-    INSERT INTO tasks (title, description, due_date, topic)
-    VALUES (@title, @description, @due_date, @topic)
-  `).run(task);
+  tasks.createTask(db, readForm(formData));
   revalidateAll();
 }
 
 export async function updateTask(id, formData) {
-  const task = readForm(formData);
-  if (!task.title) return;
-  db.prepare(`
-    UPDATE tasks SET title = @title, description = @description,
-    due_date = @due_date, topic = @topic WHERE id = @id
-  `).run({ ...task, id });
+  tasks.updateTask(db, id, readForm(formData));
   revalidateAll();
   redirect('/');
 }
 
 export async function setStatus(id, status) {
-  if (!STATUS_VALUES.includes(status)) return;
-  db.prepare('UPDATE tasks SET status = ? WHERE id = ?').run(status, id);
+  tasks.setStatus(db, id, status);
   revalidateAll();
 }
 
 export async function archiveTask(id) {
-  db.prepare(`UPDATE tasks SET archived_at = datetime('now') WHERE id = ?`).run(id);
+  tasks.archiveTask(db, id);
   revalidateAll();
 }
 
 export async function restoreTask(id) {
-  db.prepare(`UPDATE tasks SET archived_at = NULL WHERE id = ?`).run(id);
+  tasks.restoreTask(db, id);
   revalidateAll();
 }

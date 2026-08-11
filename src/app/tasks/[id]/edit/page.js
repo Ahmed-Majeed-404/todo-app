@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import db from '@/lib/db';
+import { getTask } from '@/lib/tasks';
 import { updateTask } from '@/lib/actions';
 import TaskForm from '@/components/TaskForm';
 
@@ -8,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function EditTask({ params }) {
   const { id } = await params;
-  const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(id);
+  const task = getTask(db, id);
   if (!task) notFound();
 
   return (

@@ -1,14 +1,12 @@
 import Link from 'next/link';
 import db from '@/lib/db';
+import { listArchived } from '@/lib/tasks';
 import { restoreTask } from '@/lib/actions';
 
 export const dynamic = 'force-dynamic';
 
 export default function Archive() {
-  const tasks = db.prepare(`
-    SELECT * FROM tasks WHERE archived_at IS NOT NULL
-    ORDER BY archived_at DESC
-  `).all();
+  const tasks = listArchived(db);
 
   return (
     <main className="mx-auto max-w-xl p-8">

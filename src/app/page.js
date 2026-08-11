@@ -4,6 +4,7 @@ import { createTask, archiveTask, setStatus } from '@/lib/actions';
 import { SORTS, SORT_LABELS, DEFAULT_SORT } from '@/lib/sorts';
 import { STATUSES } from '@/lib/statuses';
 import { isOverdue } from '@/lib/dates';
+import { listActive } from '@/lib/tasks';
 import TaskForm from '@/components/TaskForm';
 
 export const dynamic = 'force-dynamic';
@@ -12,9 +13,7 @@ export default async function Home({ searchParams }) {
   const { sort = DEFAULT_SORT } = await searchParams;
   const orderBy = SORTS[sort] ?? SORTS[DEFAULT_SORT];
 
-  const tasks = db.prepare(`
-    SELECT * FROM tasks WHERE archived_at IS NULL ORDER BY ${orderBy}
-  `).all();
+  const tasks = listActive(db, sort);
 
   return (
     <main className="mx-auto max-w-xl p-8">
