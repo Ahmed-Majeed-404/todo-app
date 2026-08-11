@@ -3,6 +3,7 @@ import db from '@/lib/db';
 import { createTask, archiveTask, setStatus } from '@/lib/actions';
 import { SORTS, SORT_LABELS, DEFAULT_SORT } from '@/lib/sorts';
 import { STATUSES } from '@/lib/statuses';
+import { isOverdue } from '@/lib/dates';
 import TaskForm from '@/components/TaskForm';
 
 export const dynamic = 'force-dynamic';
@@ -52,6 +53,11 @@ export default async function Home({ searchParams }) {
                   {task.topic && <span>{task.topic}</span>}
                   {task.topic && task.due_date && <span> · </span>}
                   {task.due_date && <span>Due {task.due_date}</span>}
+                  {isOverdue(task) && (
+                    <span className="ml-2 rounded border border-red-600 px-1.5 py-0.5 font-medium text-red-600">
+                      Overdue
+                    </span>
+                  )}
                 </p>
 
                 <div className="mt-3 flex gap-1 text-xs">
